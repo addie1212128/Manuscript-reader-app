@@ -78,19 +78,22 @@ function showGate() {
 gateFormEl.addEventListener('submit', async (e) => {
   e.preventDefault();
   gateErrorEl.hidden = true;
-  setPass(gateInputEl.value.trim());
+  const submitted = gateInputEl.value.trim();
+  setPass(submitted);
   try {
     // Verify by making a real protected call (direct fetch so a 401 here just
     // shows an error rather than re-triggering the gate).
-    const res = await fetch('/api/config', { headers: { 'x-app-passcode': getPass() } });
+    const res = await fetch('/api/config', { headers: { 'x-app-passcode': submitted } });
     if (res.ok) {
       gateEl.hidden = true;
       boot();
       return;
     }
     // Don't keep a passcode that just failed — otherwise it would be re-sent on
-    // the next page load and burn through the server's rate limit.
-    setPass('');
+    // the next page load and burn through the server's rate limit. But only
+    // clear it if a newer submission hasn't already replaced it (so a late,
+    // failed probe can't wipe a passcode that just succeeded).
+    if (getPass() === submitted) setPass('');
     const data = await res.json().catch(() => ({}));
     gateErrorEl.textContent =
       res.status === 429
@@ -98,7 +101,7 @@ gateFormEl.addEventListener('submit', async (e) => {
         : "That passcode didn't work. Try again.";
     gateErrorEl.hidden = false;
   } catch {
-    setPass('');
+    if (getPass() === submitted) setPass('');
     gateErrorEl.textContent = 'Could not reach the server. Try again.';
     gateErrorEl.hidden = false;
   }

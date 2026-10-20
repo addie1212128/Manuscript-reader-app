@@ -66,13 +66,16 @@ and your code is already on GitHub, so it's mostly clicking.
 3. It will ask you for a few values (none of these are stored in your code):
    - **`APP_PASSCODE`** — a long, unique passphrase of your choosing (not a common
      word). You'll type this once on your phone to unlock the app.
-   - **`OPENAI_API_KEY`** *or* **`ELEVENLABS_API_KEY`** — your voice key, for real
-     narration. (You can skip this and it'll run in Demo mode, then add the key
-     later in the Render dashboard.)
+   - **`OPENAI_API_KEY`** and **`ELEVENLABS_API_KEY`** — Render shows a field for
+     **both**. Fill in the **one** you're using and leave the other field blank.
+     (Leave both blank to run in Demo mode, then add a key later in the Render
+     dashboard → Environment.)
 4. Click **Apply / Deploy** and wait a couple of minutes. Render gives you a URL
    like `https://manuscript-reader-xxxx.onrender.com`.
 5. On your phone, open that URL, enter your passcode, and you're in. In Safari/Chrome
-   choose **“Add to Home Screen”** to get an app icon that opens full-screen.
+   choose **“Add to Home Screen”** to get an app icon that opens full-screen. The app
+   remembers your passcode **on that device** so you don't retype it each visit — clear
+   the site's browser data (or use a private tab) if you ever want it to forget.
 
 > On Render's free plan the app “sleeps” after ~15 minutes of no use and takes
 > ~30–60 seconds to wake up on the next visit. That's normal for free hosting.

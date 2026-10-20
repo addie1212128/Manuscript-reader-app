@@ -206,3 +206,4 @@ input[type='range'] { accent-color: var(--accent); }
 }
 .gate-card .btn-primary { padding: 12px; }
 .gate-error { color: var(--err); font-size: 13px; margin: 0; }
+.gate-hint { font-size: 12px; margin: 4px 0 0; }
