@@ -23,9 +23,67 @@ const resultEl = $('result');
 const playerEl = $('player');
 const downloadEl = $('download');
 
+const gateEl = $('gate');
+const gateFormEl = $('gateForm');
+const gateInputEl = $('gateInput');
+const gateErrorEl = $('gateError');
+
 let currentJob = null;
 let pollTimer = null;
 let estimateTimer = null;
+
+// ── Passcode handling ──────────────────────────────────────────
+const PASS_KEY = 'mr_passcode';
+
+function getPass() {
+  try {
+    return localStorage.getItem(PASS_KEY) || '';
+  } catch {
+    return window.__pass || '';
+  }
+}
+function setPass(v) {
+  try {
+    localStorage.setItem(PASS_KEY, v);
+  } catch {
+    window.__pass = v;
+  }
+}
+
+// All API calls go through here so they carry the passcode and surface the gate
+// on a 401 (e.g. a wrong/expired passcode on a deployed instance).
+async function api(url, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  const pass = getPass();
+  if (pass) headers['x-app-passcode'] = pass;
+  const res = await fetch(url, { ...opts, headers });
+  if (res.status === 401) {
+    showGate();
+    throw new Error('Passcode required.');
+  }
+  return res;
+}
+
+function showGate() {
+  gateEl.hidden = false;
+  setTimeout(() => gateInputEl.focus(), 50);
+}
+
+gateFormEl.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  gateErrorEl.hidden = true;
+  setPass(gateInputEl.value.trim());
+  try {
+    // Verify by making a real protected call.
+    await api('/api/config').then((r) => {
+      if (!r.ok) throw new Error('bad');
+    });
+    gateEl.hidden = true;
+    boot();
+  } catch {
+    gateErrorEl.hidden = false;
+  }
+});
 
 // ── Tabs ───────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach((tab) => {
@@ -75,7 +133,7 @@ async function uploadFile(file) {
   const form = new FormData();
   form.append('file', file);
   try {
-    const res = await fetch('/api/extract', { method: 'POST', body: form });
+    const res = await api('/api/extract', { method: 'POST', body: form });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Could not read that file.');
     textEl.value = data.text;
@@ -92,7 +150,7 @@ async function uploadFile(file) {
 
 // ── Providers / voices / models ────────────────────────────────
 async function loadConfig() {
-  const res = await fetch('/api/config');
+  const res = await api('/api/config');
   const cfg = await res.json();
   providerEl.innerHTML = '';
   cfg.providers.forEach((p) => {
@@ -108,7 +166,7 @@ async function loadConfig() {
 async function loadVoices() {
   const provider = providerEl.value;
   voiceEl.innerHTML = '<option>Loading…</option>';
-  const res = await fetch(`/api/voices?provider=${encodeURIComponent(provider)}`);
+  const res = await api(`/api/voices?provider=${encodeURIComponent(provider)}`);
   const data = await res.json();
 
   voiceEl.innerHTML = '';
@@ -169,7 +227,7 @@ async function updateEstimate() {
     return;
   }
   try {
-    const res = await fetch('/api/estimate', {
+    const res = await api('/api/estimate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, provider: providerEl.value, model: modelEl.value || undefined }),
@@ -199,7 +257,7 @@ async function startJob() {
   setProgress(0, 'Starting…');
 
   try {
-    const res = await fetch('/api/jobs', {
+    const res = await api('/api/jobs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -225,7 +283,7 @@ function poll() {
   pollTimer = setTimeout(async () => {
     if (!currentJob) return;
     try {
-      const res = await fetch(`/api/jobs/${currentJob}`);
+      const res = await api(`/api/jobs/${currentJob}`);
       const job = await res.json();
       if (!res.ok) throw new Error(job.error || 'Lost track of the job.');
 
@@ -252,7 +310,7 @@ function poll() {
 
 async function cancelJob() {
   if (!currentJob) return;
-  await fetch(`/api/jobs/${currentJob}/cancel`, { method: 'POST' }).catch(() => {});
+  await api(`/api/jobs/${currentJob}/cancel`, { method: 'POST' }).catch(() => {});
   currentJob = null;
   clearTimeout(pollTimer);
   finishWithError('Canceled.');
@@ -265,9 +323,10 @@ function showResult(job) {
   generateEl.disabled = false;
   progressEl.hidden = true;
 
-  const src = `/api/jobs/${job.id}/audio`;
+  const tokenQ = job.token ? `token=${encodeURIComponent(job.token)}` : '';
+  const src = `/api/jobs/${job.id}/audio${tokenQ ? '?' + tokenQ : ''}`;
   playerEl.src = src;
-  downloadEl.href = `${src}?download=1`;
+  downloadEl.href = `/api/jobs/${job.id}/audio?download=1${tokenQ ? '&' + tokenQ : ''}`;
   const kb = job.bytes ? ` (${(job.bytes / 1024 / 1024).toFixed(1)} MB)` : '';
   downloadEl.textContent = `⬇ Download ${job.title || 'manuscript'}.${job.format}${kb}`;
   resultEl.hidden = false;
@@ -294,5 +353,26 @@ function showError(msg) {
 }
 
 // ── Boot ───────────────────────────────────────────────────────
-loadConfig().catch((err) => showError('Could not load settings: ' + err.message));
-onTextChanged();
+function boot() {
+  loadConfig().catch((err) => {
+    // A 401 already triggered the gate; only report other failures.
+    if (err.message !== 'Passcode required.') showError('Could not load settings: ' + err.message);
+  });
+}
+
+async function start() {
+  onTextChanged();
+  let auth = { required: false };
+  try {
+    auth = await (await fetch('/api/auth')).json();
+  } catch {
+    /* if this fails, loadConfig will surface the real problem */
+  }
+  if (auth.required && !getPass()) {
+    showGate();
+    return;
+  }
+  boot();
+}
+
+start();

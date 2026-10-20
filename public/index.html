@@ -2,8 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Manuscript Reader</title>
+    <meta name="description" content="Turn your manuscript into natural-sounding audio you can listen to and keep." />
+    <!-- Phone niceties: add to home screen, run full-screen, themed status bar -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Manuscript Reader" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#b4532a" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap"
@@ -12,6 +22,18 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Passcode gate (shown only when the server requires one) -->
+    <div id="gate" class="gate" hidden>
+      <form id="gateForm" class="gate-card">
+        <div class="hero-mark">📖&nbsp;→&nbsp;🔊</div>
+        <h1>Manuscript Reader</h1>
+        <p class="muted">Enter the passcode to continue.</p>
+        <input id="gateInput" type="password" placeholder="Passcode" autocomplete="current-password" />
+        <button type="submit" class="btn-primary">Unlock</button>
+        <p id="gateError" class="gate-error" hidden>That passcode didn't work. Try again.</p>
+      </form>
+    </div>
+
     <main class="app">
       <header class="hero">
         <div class="hero-mark">📖&nbsp;→&nbsp;🔊</div>
@@ -114,8 +136,8 @@
       </section>
 
       <footer class="foot muted">
-        Runs on your own machine. Your text is sent only to the voice provider you choose — or stays
-        fully local in Demo mode.
+        Your manuscript is sent only to the voice provider you choose — and nowhere at all in Demo
+        mode.
       </footer>
     </main>
 

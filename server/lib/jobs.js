@@ -1,11 +1,14 @@
 import { promises as fs } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { getProvider } from '../tts/index.js';
 import { chunkText } from './chunk.js';
 import { combineAudio } from './audio.js';
 
-const OUTPUT_DIR = path.join(process.cwd(), 'output');
+// Use a writable temp location by default so this works on hosts whose app
+// directory is read-only. Override with OUTPUT_DIR if you want files kept.
+const OUTPUT_DIR = process.env.OUTPUT_DIR || path.join(os.tmpdir(), 'manuscript-reader-output');
 const jobs = new Map();
 const MAX_JOBS = 50; // keep memory/disk bounded
 
@@ -18,6 +21,7 @@ export function createJob({ text, providerKey, voice, model, speed, title }) {
   const id = randomUUID();
   const job = {
     id,
+    token: randomUUID(), // guards the audio URL without exposing the passcode
     status: 'running', // running | done | error | canceled
     provider: providerKey,
     format: provider.format,
@@ -93,9 +97,10 @@ export function cancelJob(id) {
 
 export function publicJob(job) {
   if (!job) return null;
-  const { id, status, totalChunks, doneChunks, chars, error, format, bytes, title } = job;
+  const { id, token, status, totalChunks, doneChunks, chars, error, format, bytes, title } = job;
   return {
     id,
+    token,
     status,
     totalChunks,
     doneChunks,

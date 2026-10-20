@@ -45,6 +45,44 @@ To get real, natural voices, add an API key (next section).
 > server-side to talk to the provider. Your manuscript text is sent **only** to the
 > provider you pick — and in Demo mode it never leaves your computer.
 
+## 📱 Put it on your phone (deploy it online)
+
+Running `npm start` only works on the computer you run it on. To use it from your
+phone anywhere, host it online. The easiest free option is **[Render](https://render.com)**,
+and your code is already on GitHub, so it's mostly clicking.
+
+> **Read this first — security:** once the app is on the public internet with your
+> API key, *anyone who finds the URL could run up your bill*. So you set a
+> **passcode** during deploy (`APP_PASSCODE`). The app is useless to anyone who
+> doesn't know it. Pick something only you know.
+
+### Deploy on Render (free)
+
+1. Go to **[render.com](https://render.com)** and sign up (you can use your GitHub account).
+2. Click **New → Blueprint**, then connect this repository (`Manuscript-reader-app`).
+   Render reads `render.yaml` and sets everything up.
+3. It will ask you for a few values (none of these are stored in your code):
+   - **`APP_PASSCODE`** — a secret word of your choosing. You'll type this once on
+     your phone to unlock the app.
+   - **`OPENAI_API_KEY`** *or* **`ELEVENLABS_API_KEY`** — your voice key, for real
+     narration. (You can skip this and it'll run in Demo mode, then add the key
+     later in the Render dashboard.)
+4. Click **Apply / Deploy** and wait a couple of minutes. Render gives you a URL
+   like `https://manuscript-reader-xxxx.onrender.com`.
+5. On your phone, open that URL, enter your passcode, and you're in. In Safari/Chrome
+   choose **“Add to Home Screen”** to get an app icon that opens full-screen.
+
+> On Render's free plan the app “sleeps” after ~15 minutes of no use and takes
+> ~30–60 seconds to wake up on the next visit. That's normal for free hosting.
+
+### Other hosts
+
+A `Dockerfile` is included (it bundles **ffmpeg** for gapless audio stitching), so
+you can also deploy to **Fly.io**, **Google Cloud Run**, **Railway**, or any VPS.
+Set the same environment variables (`APP_PASSCODE`, and a voice key). Render's native
+path above doesn't need Docker — the app just skips ffmpeg and concatenates audio
+directly, which still plays fine.
+
 ## How to use it
 
 1. **Paste** your manuscript, or **upload** a file.
