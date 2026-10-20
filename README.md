@@ -54,7 +54,9 @@ and your code is already on GitHub, so it's mostly clicking.
 > **Read this first — security:** once the app is on the public internet with your
 > API key, *anyone who finds the URL could run up your bill*. So you set a
 > **passcode** during deploy (`APP_PASSCODE`). The app is useless to anyone who
-> doesn't know it. Pick something only you know.
+> doesn't know it. Use a **long, unique passphrase** (not a common word) — the
+> server rate-limits wrong guesses, but a strong passphrase is your real
+> protection. You can generate one with `openssl rand -base64 24`.
 
 ### Deploy on Render (free)
 
@@ -62,8 +64,8 @@ and your code is already on GitHub, so it's mostly clicking.
 2. Click **New → Blueprint**, then connect this repository (`Manuscript-reader-app`).
    Render reads `render.yaml` and sets everything up.
 3. It will ask you for a few values (none of these are stored in your code):
-   - **`APP_PASSCODE`** — a secret word of your choosing. You'll type this once on
-     your phone to unlock the app.
+   - **`APP_PASSCODE`** — a long, unique passphrase of your choosing (not a common
+     word). You'll type this once on your phone to unlock the app.
    - **`OPENAI_API_KEY`** *or* **`ELEVENLABS_API_KEY`** — your voice key, for real
      narration. (You can skip this and it'll run in Demo mode, then add the key
      later in the Render dashboard.)
@@ -74,6 +76,9 @@ and your code is already on GitHub, so it's mostly clicking.
 
 > On Render's free plan the app “sleeps” after ~15 minutes of no use and takes
 > ~30–60 seconds to wake up on the next visit. That's normal for free hosting.
+> The generated audio is also stored only on that temporary server, so **download
+> any recording you want to keep before leaving the app idle** — when the service
+> sleeps, undownloaded audio is discarded and you'd need to generate it again.
 
 ### Other hosts
 

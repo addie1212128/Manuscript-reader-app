@@ -13,7 +13,8 @@
     <meta name="theme-color" content="#b4532a" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="icon.svg" />
+    <!-- iOS Safari ignores SVG for apple-touch-icon, so use a 180×180 PNG. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap"
@@ -136,8 +137,8 @@
       </section>
 
       <footer class="foot muted">
-        Your manuscript is sent only to the voice provider you choose — and nowhere at all in Demo
-        mode.
+        Your manuscript is sent to the server running this app and, from there, only to the voice
+        provider you choose (no provider in Demo mode).
       </footer>
     </main>
 

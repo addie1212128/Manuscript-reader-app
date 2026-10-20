@@ -20,4 +20,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 
+# Drop root: run as the unprivileged "node" user the base image provides.
+USER node
+
 CMD ["npm", "start"]

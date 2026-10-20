@@ -74,13 +74,22 @@ gateFormEl.addEventListener('submit', async (e) => {
   gateErrorEl.hidden = true;
   setPass(gateInputEl.value.trim());
   try {
-    // Verify by making a real protected call.
-    await api('/api/config').then((r) => {
-      if (!r.ok) throw new Error('bad');
-    });
-    gateEl.hidden = true;
-    boot();
+    // Verify by making a real protected call (direct fetch so a 401 here just
+    // shows an error rather than re-triggering the gate).
+    const res = await fetch('/api/config', { headers: { 'x-app-passcode': getPass() } });
+    if (res.ok) {
+      gateEl.hidden = true;
+      boot();
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    gateErrorEl.textContent =
+      res.status === 429
+        ? data.error || 'Too many attempts. Please wait a few minutes and try again.'
+        : "That passcode didn't work. Try again.";
+    gateErrorEl.hidden = false;
   } catch {
+    gateErrorEl.textContent = 'Could not reach the server. Try again.';
     gateErrorEl.hidden = false;
   }
 });

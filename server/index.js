@@ -22,6 +22,8 @@ const PASSCODE = (process.env.APP_PASSCODE || '').trim();
 
 const app = express();
 app.disable('x-powered-by');
+// Behind a hosting proxy (Render, Fly, etc.) so req.ip is the real client.
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '12mb' }));
 app.use(express.static(PUBLIC_DIR));
 
@@ -40,6 +42,33 @@ function safeEqual(a, b) {
   const bb = Buffer.from(String(b));
   if (ab.length !== bb.length) return false;
   return crypto.timingSafeEqual(ab, bb);
+}
+
+// Throttle brute-force guessing of the passcode: after too many failed attempts
+// from one IP within a window, that IP is blocked for the rest of the window.
+// Successful auth clears the counter. In-memory is fine for a single instance.
+const MAX_FAILS = 10;
+const FAIL_WINDOW_MS = 15 * 60 * 1000;
+const failures = new Map(); // ip -> { count, first }
+
+function isRateLimited(ip) {
+  const rec = failures.get(ip);
+  if (!rec) return false;
+  if (Date.now() - rec.first > FAIL_WINDOW_MS) {
+    failures.delete(ip);
+    return false;
+  }
+  return rec.count >= MAX_FAILS;
+}
+function noteFailure(ip) {
+  const now = Date.now();
+  const rec = failures.get(ip);
+  if (!rec || now - rec.first > FAIL_WINDOW_MS) failures.set(ip, { count: 1, first: now });
+  else rec.count += 1;
+  if (failures.size > 5000) failures.clear(); // guard against unbounded growth
+}
+function noteSuccess(ip) {
+  failures.delete(ip);
 }
 
 // ── Public routes (no passcode) ────────────────────────────────
@@ -72,7 +101,15 @@ app.get('/api/jobs/:id/audio', wrap(async (req, res) => {
 // ── Passcode gate for everything else under /api ───────────────
 app.use('/api', (req, res, next) => {
   if (!PASSCODE) return next();
-  if (safeEqual(req.get('x-app-passcode') || '', PASSCODE)) return next();
+  const ip = req.ip || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many attempts. Please wait a few minutes and try again.' });
+  }
+  if (safeEqual(req.get('x-app-passcode') || '', PASSCODE)) {
+    noteSuccess(ip);
+    return next();
+  }
+  noteFailure(ip);
   res.status(401).json({ error: 'Passcode required.' });
 });
 
