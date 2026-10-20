@@ -33,6 +33,12 @@ let pollTimer = null;
 let estimateTimer = null;
 
 // ── Passcode handling ──────────────────────────────────────────
+// Deliberate tradeoff: the passcode is remembered in localStorage so this works
+// as an "open and go" app from a phone home screen without re-entry every time.
+// That means it persists on the device (readable by scripts on this origin / in
+// DevTools). For a single-user personal deployment that's an acceptable
+// convenience; if you'd rather re-enter it each visit, swap this for an
+// in-memory variable (and drop the storage read/write below).
 const PASS_KEY = 'mr_passcode';
 
 function getPass() {
@@ -82,6 +88,9 @@ gateFormEl.addEventListener('submit', async (e) => {
       boot();
       return;
     }
+    // Don't keep a passcode that just failed — otherwise it would be re-sent on
+    // the next page load and burn through the server's rate limit.
+    setPass('');
     const data = await res.json().catch(() => ({}));
     gateErrorEl.textContent =
       res.status === 429
@@ -89,6 +98,7 @@ gateFormEl.addEventListener('submit', async (e) => {
         : "That passcode didn't work. Try again.";
     gateErrorEl.hidden = false;
   } catch {
+    setPass('');
     gateErrorEl.textContent = 'Could not reach the server. Try again.';
     gateErrorEl.hidden = false;
   }

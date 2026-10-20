@@ -10,6 +10,10 @@ services:
     healthCheckPath: /healthz
     autoDeploy: true
     envVars:
+      # Render sits behind a proxy, so trust one hop to get the real client IP
+      # (this is what makes the passcode rate limiter work correctly here).
+      - key: TRUST_PROXY_HOPS
+        value: "1"
       # A secret word you choose, so only you can use the app once it's public.
       # Render will prompt you for it on deploy (it is NOT stored in the repo).
       - key: APP_PASSCODE

@@ -22,8 +22,11 @@ const PASSCODE = (process.env.APP_PASSCODE || '').trim();
 
 const app = express();
 app.disable('x-powered-by');
-// Behind a hosting proxy (Render, Fly, etc.) so req.ip is the real client.
-app.set('trust proxy', 1);
+// Only trust X-Forwarded-For when we're actually behind a proxy (e.g. Render),
+// otherwise a direct client could spoof that header to dodge the rate limiter.
+// Off by default; the Render blueprint sets TRUST_PROXY_HOPS=1.
+const trustProxyHops = process.env.TRUST_PROXY_HOPS === '1' ? 1 : false;
+app.set('trust proxy', trustProxyHops);
 app.use(express.json({ limit: '12mb' }));
 app.use(express.static(PUBLIC_DIR));
 
