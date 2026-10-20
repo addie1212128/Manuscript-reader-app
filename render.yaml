@@ -1,0 +1,25 @@
+# Render.com blueprint — deploys this app as a free web service.
+# See the "Put it on your phone" section of the README for click-by-click steps.
+services:
+  - type: web
+    name: manuscript-reader
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      # Render sits behind a proxy, so trust one hop to get the real client IP
+      # (this is what makes the passcode rate limiter work correctly here).
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      # A secret word you choose, so only you can use the app once it's public.
+      # Render will prompt you for it on deploy (it is NOT stored in the repo).
+      - key: APP_PASSCODE
+        sync: false
+      # Add ONE of these for real voices (also prompted on deploy, never in the repo).
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false

@@ -168,3 +168,42 @@ input[type='range'] { accent-color: var(--accent); }
 .result audio { width: 100%; }
 
 .foot { text-align: center; margin-top: 10px; font-size: 13px; }
+
+/* Passcode gate */
+.gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 50;
+}
+.gate-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gate-card h1 { font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 26px; margin: 4px 0 0; }
+.gate-card .hero-mark { font-size: 24px; letter-spacing: 2px; }
+.gate-card input {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 16px; /* 16px avoids iOS zoom-on-focus */
+  background: var(--bg);
+  color: var(--ink);
+  text-align: center;
+}
+.gate-card .btn-primary { padding: 12px; }
+.gate-error { color: var(--err); font-size: 13px; margin: 0; }
+.gate-hint { font-size: 12px; margin: 4px 0 0; }

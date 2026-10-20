@@ -1,0 +1,14 @@
+{
+  "name": "Manuscript Reader",
+  "short_name": "Reader",
+  "description": "Turn your manuscript into natural-sounding audio you can listen to and keep.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f2ec",
+  "theme_color": "#b4532a",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
