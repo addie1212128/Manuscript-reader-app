@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manuscript Reader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <div class="hero-mark">📖&nbsp;→&nbsp;🔊</div>
+        <h1>Manuscript Reader</h1>
+        <p class="subtitle">Turn your manuscript into natural-sounding audio you can listen to and keep.</p>
+      </header>
+
+      <!-- Step 1: the manuscript -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step">1</span>
+          <h2>Your manuscript</h2>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" data-tab="paste" role="tab">Paste text</button>
+          <button class="tab" data-tab="upload" role="tab">Upload a file</button>
+        </div>
+
+        <div class="tab-panel is-active" data-panel="paste">
+          <textarea
+            id="text"
+            placeholder="Paste your manuscript here — a chapter, a scene, or the whole thing…"
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <div class="tab-panel" data-panel="upload">
+          <label id="drop" class="dropzone" for="file">
+            <input id="file" type="file" accept=".txt,.md,.docx,.pdf" hidden />
+            <div class="dropzone-inner">
+              <div class="dropzone-icon">⬆</div>
+              <div><strong>Choose a file</strong> or drag it here</div>
+              <div class="muted">.txt &nbsp;·&nbsp; .md &nbsp;·&nbsp; .docx &nbsp;·&nbsp; .pdf</div>
+            </div>
+          </label>
+          <div id="fileStatus" class="file-status" hidden></div>
+        </div>
+
+        <div class="meta-row">
+          <span id="counts" class="muted">0 words · 0 characters</span>
+          <input id="title" class="title-input" type="text" placeholder="Title (used for the file name)" />
+        </div>
+      </section>
+
+      <!-- Step 2: the voice -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step">2</span>
+          <h2>Voice</h2>
+        </div>
+
+        <div class="grid">
+          <label class="field">
+            <span>Provider</span>
+            <select id="provider"></select>
+          </label>
+          <label class="field">
+            <span>Voice</span>
+            <select id="voice"></select>
+          </label>
+          <label class="field" id="modelField">
+            <span>Quality / model</span>
+            <select id="model"></select>
+          </label>
+          <label class="field">
+            <span>Speed <em id="speedVal">1.0×</em></span>
+            <input id="speed" type="range" min="0.5" max="2" step="0.05" value="1" />
+          </label>
+        </div>
+
+        <p id="providerNote" class="provider-note"></p>
+      </section>
+
+      <!-- Step 3: generate -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step">3</span>
+          <h2>Create the audio</h2>
+        </div>
+
+        <p id="estimate" class="estimate muted">Add some text to see an estimate.</p>
+
+        <div class="actions">
+          <button id="generate" class="btn-primary" disabled>Create audio</button>
+          <button id="cancel" class="btn-ghost" hidden>Cancel</button>
+        </div>
+
+        <div id="progress" class="progress" hidden>
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+          <div id="progressLabel" class="muted"></div>
+        </div>
+
+        <div id="error" class="error" hidden></div>
+
+        <div id="result" class="result" hidden>
+          <audio id="player" controls></audio>
+          <a id="download" class="btn-primary" download>⬇ Download audio</a>
+        </div>
+      </section>
+
+      <footer class="foot muted">
+        Runs on your own machine. Your text is sent only to the voice provider you choose — or stays
+        fully local in Demo mode.
+      </footer>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

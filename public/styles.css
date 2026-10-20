@@ -1,0 +1,170 @@
+:root {
+  --bg: #f5f2ec;
+  --card: #fffdf9;
+  --ink: #26221c;
+  --muted: #8a8276;
+  --line: #e7e0d4;
+  --accent: #b4532a;
+  --accent-ink: #fff;
+  --accent-soft: #f6e6dd;
+  --ok: #3f7d4e;
+  --err: #b23b3b;
+  --shadow: 0 1px 2px rgba(40, 30, 15, 0.05), 0 8px 24px rgba(40, 30, 15, 0.06);
+  --radius: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17150f;
+    --card: #221f18;
+    --ink: #efe9dd;
+    --muted: #9b9484;
+    --line: #35312a;
+    --accent: #e0783f;
+    --accent-ink: #1a1710;
+    --accent-soft: #2e251c;
+    --ok: #6fbf84;
+    --err: #e98585;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* The [hidden] attribute must win over any element that sets its own display
+   (e.g. .field and .result use display:flex), otherwise toggling `hidden` in JS
+   does nothing. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+}
+
+.hero { text-align: center; margin-bottom: 28px; }
+.hero-mark { font-size: 30px; letter-spacing: 2px; }
+.hero h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 600;
+  font-size: 40px;
+  margin: 6px 0 4px;
+  letter-spacing: -0.5px;
+}
+.subtitle { color: var(--muted); margin: 0; font-size: 16px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+.card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.card-head h2 { font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 21px; margin: 0; }
+.step {
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 14px;
+  flex: none;
+}
+
+.muted { color: var(--muted); font-size: 14px; }
+
+/* Tabs */
+.tabs { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 3px; margin-bottom: 14px; }
+.tab {
+  border: 0; background: transparent; color: var(--muted);
+  padding: 7px 16px; border-radius: 7px; cursor: pointer; font: inherit; font-weight: 500;
+}
+.tab.is-active { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.tab-panel { display: none; }
+.tab-panel.is-active { display: block; }
+
+textarea {
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  font: inherit;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--ink);
+}
+textarea:focus, select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Dropzone */
+.dropzone {
+  display: block;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  padding: 34px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: var(--bg);
+}
+.dropzone:hover, .dropzone.is-drag { border-color: var(--accent); background: var(--accent-soft); }
+.dropzone-icon { font-size: 26px; color: var(--accent); margin-bottom: 8px; }
+.dropzone-inner div { margin: 2px 0; }
+.file-status { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: var(--accent-soft); font-size: 14px; }
+
+.meta-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.title-input { flex: 1; min-width: 200px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font: inherit; background: var(--bg); color: var(--ink); }
+
+/* Fields */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 540px) { .grid { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+.field span { color: var(--muted); }
+.field em { color: var(--ink); font-style: normal; }
+select, .field input[type='range'] { width: 100%; }
+select {
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px;
+  font: inherit; background: var(--bg); color: var(--ink); cursor: pointer;
+}
+input[type='range'] { accent-color: var(--accent); }
+
+.provider-note { font-size: 13px; color: var(--muted); margin: 14px 0 0; }
+
+.estimate { margin: 0 0 16px; }
+.estimate strong { color: var(--ink); }
+
+.actions { display: flex; gap: 10px; align-items: center; }
+.btn-primary {
+  background: var(--accent); color: var(--accent-ink);
+  border: 0; border-radius: 11px; padding: 12px 22px;
+  font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
+}
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 11px; padding: 12px 18px; font: inherit; cursor: pointer; }
+
+.progress { margin-top: 18px; }
+.progress-bar { height: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0; background: var(--accent); transition: width 0.3s ease; }
+.progress-label, #progressLabel { margin-top: 8px; }
+
+.error { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: color-mix(in srgb, var(--err) 14%, transparent); color: var(--err); font-size: 14px; border: 1px solid color-mix(in srgb, var(--err) 35%, transparent); }
+
+.result { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.result audio { width: 100%; }
+
+.foot { text-align: center; margin-top: 10px; font-size: 13px; }

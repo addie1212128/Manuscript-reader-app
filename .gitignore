@@ -1,0 +1,10 @@
+node_modules/
+output/
+uploads/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Local tooling / assistant session state
+.anchor/
